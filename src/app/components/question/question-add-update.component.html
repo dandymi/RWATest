@@ -1,0 +1,56 @@
+<mat-card>
+    <form (ngSubmit)="onSubmit()" class="question-form" [formGroup]="questionForm" novalidate>
+        <mat-card-title>Add Question</mat-card-title>
+        <mat-card-header>
+            <mat-card-title>
+                <mat-select placeholder="category" name="category" class="required" formControlName="category">
+                    <mat-option *ngFor="let category of categories" [value]="category.id">{{category.categoryName}}</mat-option>
+                </mat-select>
+                <p *ngIf="questionForm.controls.category.errors && !questionForm.controls.category.pristine" style="font-size: 11px;">Select a category</p>
+            </mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+            <mat-input-container class="full-width required">
+                <input matInput formControlName="questionText" type="text" class="required" placeholder="Question">
+                <mat-hint align="end" *ngIf="questionForm.controls.questionText.errors && !questionForm.controls.questionText.printine" class="error">Question is required!</mat-hint>
+            </mat-input-container>
+            <div formArrayName="answers" class="well well-lg">
+                <div *ngFor="let answer of answers.controls; let i = index" [formGroupName]="i">
+                    <mat-input-container class="full-width">
+                        <mat-checkbox matPrefix formControlName="correct"></mat-checkbox>
+                        <input matInput [placeholder]="'Answer ' + (i+1)" formControlName="answerText" />
+                        <mat-hint align="end" *ngIf="answers.controls[i].controls.answerText.errors && !answers.controls[i].controls.answerText.prinstine" class="error">Answer required</mat-hint>
+                    </mat-input-container>
+                </div>
+            </div>
+            <div class="error" *ngIf="answers.valid && questionForm.hasError('correctAnswerCountInvalid')">
+                Pick one and only one correct answer
+            </div>
+            <p>
+                <mat-checkbox formControlName="ordered">Ordered?</mat-checkbox>
+            </p>
+            <p>
+                <mat-input-container class="full-width required">
+                    <textarea matInput formControlName="explanation" placeholder="Explanation"></textarea>
+                </mat-input-container>
+            </p>
+            <p>
+                <mat-input-container>
+                    <input matInput formControlName="tags" placeholder="Tag">
+                </mat-input-container>
+                <button mat-button color="primary" [disabled]="questionForm.controls.tags.value==''" (click)="addTag()">ADD</button>
+            </p>
+            <mat-chip-list>
+                <mat-chip *ngFor="let tag of autoTags">{{tag}}</mat-chip>
+                <mat-chip *ngFor="let tag of enteredTags">
+                    {{tag}} <span (click)="removeEnteredTag(tag)" class="remove-tag"></span>
+                </mat-chip>
+            </mat-chip-list>
+        </mat-card-content>
+        <div class="error" *ngIf="answers.valid && questionForm.controls.questionText.valid && questionForm.hasError('tagCountInvalid')">Must have at least 3 tags</div>
+        <mat-card-actions>
+            <button mat-button [disabled]="!questionForm.valid" type="submit" color="primary">SAVE</button>
+            <button mat-button>CANCEL</button>
+        </mat-card-actions>
+    </form>
+</mat-card>
